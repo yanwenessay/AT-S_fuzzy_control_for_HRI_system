@@ -1,5 +1,11 @@
 # AT-S_fuzzy_control_for_HRI_system
 
+<img width="1865" height="262" alt="experimental_process" src="https://github.com/user-attachments/assets/f20ea02a-b7e4-4443-8dbc-ff42cc24ff5f" />
+
+<img width="1931" height="817" alt="experimental_process4" src="https://github.com/user-attachments/assets/ea5c31ae-9162-4036-bd74-6df1aae729a0" />
+
+
+
 # Kinova Gen3 上的 AT-S 阻抗控制方法
 
 本文件夹提供了一个轻量化、适合上传 GitHub 的运行入口，用于在 Kinova Gen3 7 自由度机械臂上运行所提出的自适应 Takagi-Sugeno（AT-S）补偿阻抗控制器。
