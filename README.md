@@ -2,6 +2,8 @@
 
 https://github.com/user-attachments/assets/180bafd0-7812-4f9b-a3f8-51e0bd93270f
 
+<img width="505" height="449" alt="屏幕截图 2026-06-13 210141" src="https://github.com/user-attachments/assets/e60e4109-c2d1-4201-902c-fe908b597bd1" />
+
 https://github.com/user-attachments/assets/b6b6c6be-d588-4486-b501-26d7a278a1f0
 
 <img width="1865" height="262" alt="experimental_process" src="https://github.com/user-attachments/assets/f20ea02a-b7e4-4443-8dbc-ff42cc24ff5f" />
