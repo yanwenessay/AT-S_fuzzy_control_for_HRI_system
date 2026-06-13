@@ -12,32 +12,68 @@ https://github.com/user-attachments/assets/b6b6c6be-d588-4486-b501-26d7a278a1f0
 
 
 
-# Kinova Gen3 上的 AT-S 阻抗控制方法
+# Kinova Gen3 的 AT-S 阻抗控制
 
-本文件夹提供了一个轻量化、适合上传 GitHub 的运行入口，用于在 Kinova Gen3 7 自由度机械臂上运行所提出的自适应 Takagi-Sugeno（AT-S）补偿阻抗控制器。
+本仓库提供一套面向 Kinova Gen3 7 自由度机械臂的自适应 Takagi-Sugeno（AT-S）补偿阻抗控制 Python 实现。
 
-控制器主程序位于：
+该程序用于真实机器人实验，基于 Kinova Kortex Python API，包含 AT-S 阻抗主控制器、变阻抗力矩控制框架、运动学、模糊逻辑工具，以及需要用户自行配置机器人网络参数的安全启动脚本。
+
+## 主要内容
+
+主控制器位于：
 
 ```text
-../Response1/comparison_proposed_method_ats.py
+src/comparison_proposed_method_ats.py
 ```
 
-该控制器主要包括：
+该控制器集成了：
 
 * 等效末端阻抗控制；
 * AT-S 模糊自适应补偿；
-* 基于加权外部关节力矩的力感知衰减机制；
-* 通过 Kinova Kortex Python API 实现底层力矩控制。
+* 基于外部关节力矩加权的力感知衰减；
+* 保守的模型动力学补偿；
+* 通过 Kortex API 实现 Kinova Gen3 底层力矩控制；
+* 跟踪误差、外力矩、控制力矩和 AT-S 补偿的数据记录与绘图。
 
-## 1. 硬件与软件要求
+## 文件结构
 
-目标平台：
+```text
+.
++-- README.md
++-- SAFETY.md
++-- requirements.txt
++-- setup_env.sh
++-- run_kinova_gen3.sh
++-- .env.example
++-- .gitignore
++-- scripts/
+|   +-- check_environment.py
+|   +-- run_proposed_ats.py
++-- src/
+    +-- comparison_proposed_method_ats.py
+    +-- ats_imcontrol_sin_cos_jo.py
+    +-- Kinematic_fcn.py
+    +-- DiscreteIntegrator.py
+    +-- ts_fuzzy_output.py
+    +-- fuzzy_membership_fcn.py
+    +-- fuzzyoutput.py
+    +-- control_main.py
+    +-- utilities.py
+```
+
+## 硬件与软件要求
+
+硬件：
 
 * Kinova Gen3 7 自由度机械臂；
-* 连接到机器人网络的 Ubuntu/Linux 主机；
+* 一台连接机器人网络的 Linux/Ubuntu 电脑；
+* 现场操作人员需能够随时使用急停按钮。
+
+软件：
+
 * Python 3.8 或更高版本；
-* 已安装并可导入 `kortex_api` 的 Kinova Kortex Python API；
-* Python 路径中可访问 Kinova API 示例辅助文件 `utilities.py`。
+* 已安装 Kinova 官方 Kortex Python API，并可通过 `kortex_api` 导入；
+* `requirements.txt` 中列出的 Python 依赖包。
 
 安装依赖：
 
@@ -45,45 +81,21 @@ https://github.com/user-attachments/assets/b6b6c6be-d588-4486-b501-26d7a278a1f0
 pip install -r requirements.txt
 ```
 
-Kinova Kortex Python API 通常需要从 Kinova 官方 Kortex API 包中安装，而不是从 PyPI 安装。安装后可用以下命令检查：
+验证 Kortex API：
 
 ```bash
 python3 -c "import kortex_api; print('kortex_api OK')"
 ```
 
-## 2. 项目目录结构
+## 配置机器人连接
 
-该启动器默认项目结构如下：
-
-```text
-ATS_impedance_control/
-+-- Response1/
-|   +-- comparison_proposed_method_ats.py
-+-- ats_imcontrol_sin_cos_jo.py
-+-- Kinematic_fcn.py
-+-- DiscreteIntegrator.py
-+-- ts_fuzzy_output.py
-+-- proposed_ats_kinova_gen3_github/
-    +-- README.md
-    +-- requirements.txt
-    +-- setup_env.sh
-    +-- run_kinova_gen3.sh
-    +-- scripts/
-        +-- check_environment.py
-        +-- run_proposed_ats.py
-```
-
-如果 `utilities.py` 不在项目根目录，请从 Kinova Kortex Python 示例文件夹中复制，或将其所在路径加入 `PYTHONPATH`。
-
-## 3. 配置机器人连接
-
-复制环境变量示例文件：
+复制环境变量模板：
 
 ```bash
 cp .env.example .env
 ```
 
-然后在 `.env` 中填写自己的机器人网络配置：
+然后在 `.env` 中填写自己的机器人参数：
 
 ```bash
 KINOVA_IP=<YOUR_KINOVA_ROBOT_IP>
@@ -91,11 +103,11 @@ KINOVA_USERNAME=<YOUR_KINOVA_USERNAME>
 KINOVA_PASSWORD=<YOUR_KINOVA_PASSWORD>
 ```
 
-不要将真实机器人 IP、用户名或密码发布到公开仓库中。
+本仓库不提供默认 IP、用户名或密码。请勿将私人机器人网络信息提交到 GitHub。
 
-## 4. 环境检查
+## 检查环境
 
-在当前文件夹中运行：
+运行：
 
 ```bash
 python3 scripts/check_environment.py
@@ -103,86 +115,89 @@ python3 scripts/check_environment.py
 
 该脚本会检查：
 
-* Python 版本；
-* 所需 Python 依赖；
-* `kortex_api` 是否可导入；
-* 本地控制器文件是否存在；
-* Kinova `utilities.py` 是否可访问。
+* `src/` 中的必要源码文件；
+* 必需的 Python 依赖；
+* `kortex_api` 是否可用；
+* Kinova 连接辅助文件 `src/utilities.py` 是否存在。
 
-## 5. 在 Kinova Gen3 上运行
+## 运行控制器
 
-创建 `.env` 后，运行：
+推荐使用启动脚本：
 
 ```bash
 ./run_kinova_gen3.sh
 ```
 
-等效的直接运行命令为：
+也可以直接运行：
 
 ```bash
 python3 scripts/run_proposed_ats.py --ip <YOUR_KINOVA_ROBOT_IP> -u <YOUR_KINOVA_USERNAME> -p <YOUR_KINOVA_PASSWORD>
 ```
 
-如果机械臂已经处于安全初始位姿，可以跳过初始关节运动：
+如果机器人已经处于安全初始位姿，可跳过初始运动：
 
 ```bash
 python3 scripts/run_proposed_ats.py --ip <YOUR_KINOVA_ROBOT_IP> -u <YOUR_KINOVA_USERNAME> -p <YOUR_KINOVA_PASSWORD> --skip-initial-move
 ```
 
-程序默认会先移动到初始位姿，除非使用 `--skip-initial-move`。之后程序会等待键盘输入：
+程序启动后会等待键盘输入：
 
 ```text
-s = start torque control
-q = quit
+s = 开始底层力矩控制
+q = 退出
 ```
 
-在输入 `s` 之前，不会发送任何力矩控制命令。
+只有输入 `s` 后，程序才会发送力矩命令。
 
-## 6. 数据输出
+## 输出数据
 
-控制器会将工作目录固定在 `comparison_proposed_method_ats.py` 附近。通常会生成以下文件夹：
+程序运行时以 `src/` 作为工作目录，通常会生成：
 
 ```text
-Response1/impedance_improved_data/
-Response1/proposed_method_plots/
+src/impedance_improved_data/
+src/proposed_method_plots/
 ```
 
-记录数据包括关节跟踪误差、外部力矩、控制力矩、AT-S 补偿量以及相关统计信息。
+这些输出文件夹已被 `.gitignore` 忽略，默认不提交到仓库，除非需要发布实验数据。
 
-## 7. 安全注意事项
+## 安全说明
 
-每次真实机器人实验前，请务必确认：
+该程序会向真实机器人发送底层力矩命令。运行前请务必：
 
-* 急停按钮在可触及范围内；
-* 工作空间已清空；
-* 先进行低速、无接触测试；
-* 按下 `s` 前确认机器人处于安全位姿；
-* 不要在没有现场人员可立即急停的情况下，通过远程 SSH 运行底层力矩控制；
-* 确认 Kinova Web App 或其他程序没有占用不兼容的伺服模式。
+* 阅读 `SAFETY.md`；
+* 保持急停按钮在可触及范围内；
+* 确保机器人工作空间清空；
+* 先进行无接触测试；
+* 不要让机器人无人值守运行；
+* 只有在机械臂稳定且现场人员准备好的情况下，才输入 `s`。
 
-更详细的安全检查请见 `SAFETY.md`。
+如果机器人出现异常加速、碰撞环境，或频繁报告伺服模式错误，应立即停止程序，并通过 Kinova Web App 或标准恢复流程恢复机器人。
 
-## 8. 常见问题
+## 常见问题
 
 ### `ModuleNotFoundError: No module named 'kortex_api'`
 
-请安装 Kinova Kortex Python API，并确认已激活正确的 Python 环境。
+请安装 Kinova 官方 Kortex Python API，并确认当前 Python 环境可以导入 `kortex_api`。
 
-### `ModuleNotFoundError: No module named 'utilities'`
+### `Missing Kinova connection settings`
 
-请确保 Kinova 示例中的 `utilities.py` 位于项目根目录，或已加入 `PYTHONPATH`。
+请根据 `.env.example` 创建 `.env`，并填写机器人 IP、用户名和密码。
 
 ### `WRONG_SERVOING_MODE`
 
-可能有其他程序修改了机械臂伺服模式。请停止其他控制脚本，在 Kinova Web App 中恢复机器人状态，然后重新运行程序。
+可能有其他程序正在控制机器人，或机器人未处于期望的底层伺服模式。请停止其他控制程序，恢复机器人后重新运行。
 
-### 程序启动后机器人不动
+### Baseline database not found
 
-这是正常现象。程序会等待输入 `s` 后才开始力矩控制。
+即使没有无接触基准数据库，控制器也可以运行。此时基准缩放功能会被关闭，程序会继续执行。也可以使用：
 
-## 9. 引用占位符
+```bash
+python3 scripts/run_proposed_ats.py --ip <YOUR_KINOVA_ROBOT_IP> -u <YOUR_KINOVA_USERNAME> -p <YOUR_KINOVA_PASSWORD> --no-baseline
+```
 
-如果在学术工作中使用本代码，请在论文发表后引用对应论文。
+## 引用
+
+如果本代码用于学术研究，请在论文发表后引用对应文章。
 
 ```bibtex
 @article{yanwen_ats_impedance_kinova,
@@ -192,3 +207,4 @@ Response1/proposed_method_plots/
   year    = {2026}
 }
 ```
+
