@@ -1,5 +1,7 @@
 # AT-S_fuzzy_control_for_HRI_system
 
+https://github.com/user-attachments/assets/0a6257c3-45a9-49e9-afa8-9e591a1ea66c
+
 <img width="1865" height="262" alt="experimental_process" src="https://github.com/user-attachments/assets/f20ea02a-b7e4-4443-8dbc-ff42cc24ff5f" />
 
 <img width="1931" height="817" alt="experimental_process4" src="https://github.com/user-attachments/assets/ea5c31ae-9162-4036-bd74-6df1aae729a0" />
