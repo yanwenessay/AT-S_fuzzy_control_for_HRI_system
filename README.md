@@ -1,6 +1,6 @@
 # AT-S_fuzzy_control_for_HRI_system
-
-https://github.com/user-attachments/assets/0a6257c3-45a9-49e9-afa8-9e591a1ea66c
+https://github.com/user-attachments/assets/180bafd0-7812-4f9b-a3f8-51e0bd93270f
+https://github.com/user-attachments/assets/b6b6c6be-d588-4486-b501-26d7a278a1f0
 
 <img width="1865" height="262" alt="experimental_process" src="https://github.com/user-attachments/assets/f20ea02a-b7e4-4443-8dbc-ff42cc24ff5f" />
 
